@@ -14,5 +14,18 @@ data/runs/iberia_test/*
 !data/runs/iberia_test/verification.txt
 !data/runs/iberia_test/provenance/
 
+# Casos Lausanne: solo configuración, scripts y justificación
+!data/runs/lausanne_pully_*/
+data/runs/lausanne_pully_*/*
+!data/runs/lausanne_pully_*/README.md
+!data/runs/lausanne_pully_*/namelist.wps
+!data/runs/lausanne_pully_*/namelist.input
+!data/runs/lausanne_pully_*/GEOGRID.TBL
+!data/runs/lausanne_pully_*/run_wps.sh
+!data/runs/lausanne_pully_*/run_wrf.sh
+!data/runs/lausanne_pully_*/extract_pblh_pully.py
+!data/runs/lausanne_pully_*/provenance/
+!data/runs/lausanne_pully_*/diagnostics/
+
 # Imágenes docker exportadas
 *.tgz

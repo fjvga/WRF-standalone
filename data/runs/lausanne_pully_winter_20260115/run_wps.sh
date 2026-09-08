@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 CASE=/data/runs/lausanne_pully_winter_20260115
-METDIR=/data/meteo/gfs_20260115_00z
+METDIR=/data/meteo/gfs_20260112_00z
 
 cd "$CASE"
 
@@ -16,7 +16,7 @@ echo "== geogrid =="
 ./geogrid.exe > geogrid.stdout 2>&1
 grep -q "Successful completion" geogrid.log
 
-echo "== ungrib (GFS 2026-01-15 00Z, f000-f072) =="
+echo "== ungrib (GFS 2026-01-15 00Z, f000-f144) =="
 rm -f GRIBFILE.*
 /opt/WPS/link_grib.csh "$METDIR"/gfs.* > link_grib.out 2>&1
 ./ungrib.exe > ungrib.stdout 2>&1
@@ -28,6 +28,6 @@ grep -q "Successful completion" metgrid.log
 
 for dom in 01 02 03 04; do
   N=$(ls met_em.d${dom}.*.nc | wc -l)
-  echo "WPS-OK d${dom}: $N ficheros met_em (esperados 25: 72 h a 3 h)"
-  [ "$N" -eq 25 ]
+  echo "WPS-OK d${dom}: $N ficheros met_em (esperados 49: 144 h a 3 h (3 d spin-up + episodio))"
+  [ "$N" -eq 49 ]
 done

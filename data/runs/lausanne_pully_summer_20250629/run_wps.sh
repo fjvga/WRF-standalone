@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 CASE=/data/runs/lausanne_pully_summer_20250629
-METDIR=/data/meteo/gfs_20250629_00z
+METDIR=/data/meteo/gfs_20250626_00z
 
 cd "$CASE"
 
@@ -28,6 +28,6 @@ grep -q "Successful completion" metgrid.log
 
 for dom in 01 02 03 04; do
   N=$(ls met_em.d${dom}.*.nc | wc -l)
-  echo "WPS-OK d${dom}: $N ficheros met_em (esperados 25: 72 h a 3 h)"
-  [ "$N" -eq 25 ]
+  echo "WPS-OK d${dom}: $N ficheros met_em (esperados 49: 144 h a 3 h (3 d spin-up + episodio))"
+  [ "$N" -eq 49 ]
 done

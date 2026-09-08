@@ -1,11 +1,11 @@
 &time_control
- run_days                            = 3,
+ run_days                            = 6,
  run_hours                           = 0,
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          = 2026, 2026, 2026, 2026,
  start_month                         = 01,   01,   01,   01,
- start_day                           = 15,   15,   15,   15,
+ start_day                           = 12,   12,   12,   12,
  start_hour                          = 00,   00,   00,   00,
  end_year                            = 2026, 2026, 2026, 2026,
  end_month                           = 01,   01,   01,   01,

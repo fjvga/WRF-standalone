@@ -1,0 +1,18 @@
+# Datos pesados y salidas (no se versionan; ya están en la imagen o son productos)
+data/geog/
+data/meteo/
+data/runs/*
+
+# Del caso plantilla solo se versiona configuración y expedientes de auditoría
+!data/runs/iberia_test/
+data/runs/iberia_test/*
+!data/runs/iberia_test/namelist.wps
+!data/runs/iberia_test/namelist.input
+!data/runs/iberia_test/GEOGRID.TBL
+!data/runs/iberia_test/run_wps.sh
+!data/runs/iberia_test/run_wrf.sh
+!data/runs/iberia_test/verification.txt
+!data/runs/iberia_test/provenance/
+
+# Imágenes docker exportadas
+*.tgz

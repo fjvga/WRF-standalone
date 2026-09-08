@@ -1,0 +1,80 @@
+# syntax=docker/dockerfile:1
+###############################################################################
+# WPS (WRF Preprocessing System) v4.7.0 — extiende la imagen wrf:4.7.1
+#
+#   Añade:
+#     - Jasper 2.0.33 desde fuente (retirado de Ubuntu 22.04; lo necesita
+#       ungrib para decodificar GRIB2 de GFS)
+#     - WPS (geogrid, ungrib, metgrid) compilado GNU/dmpar
+#     - python3 + netCDF4 + numpy (análisis y verificación de salidas)
+#
+#   Build: docker build -t wrf-wps:4.7.1 --build-arg JOBS=8 \
+#            -f docker/Dockerfile.wps docker/
+#   El contexto usa la misma carpeta docker/ (solo por uniformidad).
+###############################################################################
+FROM wrf:4.7.1
+
+ARG WPS_VERSION=v4.7.0
+ARG JASPER_VERSION=2.0.33
+ARG JOBS=8
+
+# ---- 1) Extras de sistema: cmake (jasper) y análisis Python -------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        cmake python3-netcdf4 python3-numpy \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- 2) Jasper desde fuente (tarball fijado en el contexto; sha256 en README) --
+COPY jasper-${JASPER_VERSION}.tar.gz /tmp/
+RUN cd /tmp \
+ && tar xzf jasper-${JASPER_VERSION}.tar.gz \
+ && cd jasper-${JASPER_VERSION} \
+ && mkdir bld && cd bld \
+ && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+         -DJAS_ENABLE_OPENGL=OFF -DJAS_ENABLE_DOC=OFF \
+         .. > /tmp/jasper-cmake.log 2>&1 \
+ && make -j${JOBS} > /tmp/jasper-make.log 2>&1 \
+ && make install >> /tmp/jasper-make.log 2>&1 \
+ && ldconfig \
+ && rm -rf /tmp/jasper* \
+ || { echo "=== jasper-cmake.log ==="; tail -25 /tmp/jasper-cmake.log 2>/dev/null; \
+      echo "=== jasper-make.log ==="; tail -25 /tmp/jasper-make.log 2>/dev/null; exit 1; }
+
+ENV JASPERLIB=/usr/local/lib \
+    JASPERINC=/usr/local/include
+
+# ---- 3) WPS --------------------------------------------------------------------
+RUN git clone --depth 1 --branch ${WPS_VERSION} https://github.com/wrf-model/WPS.git /opt/WPS
+WORKDIR /opt/WPS
+
+# configure: "3" = Linux x86_64, gfortran (dmpar) — primer bloque x86_64 del menú
+# (1=serial, 2=serial_NO_GRIB2, 3=dmpar, 4=dmpar_NO_GRIB2)
+RUN printf '3\n' | ./configure > /tmp/wps-configure.log 2>&1 \
+ && grep -q "dmpar" configure.wps \
+ && grep -q "gfortran" configure.wps
+
+# Ubuntu: WPS enlaza solo -lnetcdf (C) y olvida la librería Fortran (-lnetcdff),
+# lo que rompe el link de int2nc/metgrid con símbolos nf_* sin resolver.
+RUN grep -q netcdff configure.wps \
+ || sed -i 's/-lnetcdf/-lnetcdff -lnetcdf/' configure.wps \
+ ; grep -q netcdff configure.wps
+
+RUN ./compile > /tmp/compile_wps.log 2>&1 \
+ && test -f geogrid/src/geogrid.exe \
+ && test -f ungrib/src/ungrib.exe \
+ && test -f metgrid/src/metgrid.exe \
+ || { echo "=== TAIL compile_wps.log ==="; tail -60 /tmp/compile_wps.log; exit 1; }
+
+ENV WPS_DIR=/opt/WPS
+
+LABEL org.opencontainers.image.title="WRF + WPS (WRF-CHIMERE proyecto)" \
+      org.opencontainers.image.version="wrf4.7.1-wps4.7.0" \
+      wrf.version="4.7.1" \
+      wps.version="4.7.0" \
+      jasper.version="2.0.33" \
+      netcdf-c.version="4.8.1" \
+      netcdf-fortran.version="4.5.4" \
+      openmpi.version="4.1.2" \
+      gfortran.version="11.4" \
+      base.image="ubuntu:22.04"
+
+WORKDIR /data

@@ -1,0 +1,11 @@
+[OK ] Sin NaN en variables de superficie: wrfout_d01_2026-09-07_12:00:00
+[OK ] Rango T2 plausible (250-325 K): media dominio 293.1-301.7 K
+[OK ] Rango PSFC plausible (85000-105000 Pa): media dominio 97935-98339 Pa
+[OK ] Viento 10m < 45 m/s: máximo 13.6 m/s
+[OK ] Ciclo diurno T2 coherente (amplitud 4-20 K): amplitud 8.6 K; mínimo en t++18 h, máximo en t++3 h
+[OK ] T2 t=0 consistente con GFS (met_em): |Δ media| = 0.00 (umbral 4.0); met_em 301.7 vs wrf 301.7
+[OK ] PSFC t=0 consistente con GFS (met_em): |Δ media| = 4.33 (umbral 250.0); met_em 98335.1 vs wrf 98339.4
+[OK ] T2 t=+24 h consistente con GFS (met_em): |Δ media| = 0.61 (umbral 5.0); met_em 300.5 vs wrf 299.9
+[OK ] PSFC t=+24 h consistente con GFS (met_em): |Δ media| = 25.04 (umbral 300.0); met_em 97910.1 vs wrf 97935.2
+
+RESUMEN: 9/9 comprobaciones superadas
